@@ -1,0 +1,8 @@
+[template]
+src = "nginx.tmpl"
+dest = "/etc/nginx/conf.d/default.conf"
+keys = [ "/services" ]
+owner = "root"
+mode = "0644"
+check_cmd = "/check-nginx-config.sh {{ .src }}"
+reload_cmd = "nginx -s reload"

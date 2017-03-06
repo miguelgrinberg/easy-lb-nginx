@@ -1,0 +1,24 @@
+{{ range $service := ls "/services" }}
+upstream {{ $service }}_pool {
+    {{ range getvs (printf "/services/%s/*" $service) }}
+    server {{ . }};
+    {{ end }}
+}
+{{ end }}
+
+server {
+    listen 80 default_server;
+
+    access_log /dev/stdout;
+    error_log /dev/stderr;
+
+    {{ range $service := ls "/services" }}
+    location /{{ $service }}/ {
+        proxy_pass http://{{ $service }}_pool;
+        proxy_redirect off;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+    {{ end }}
+}
