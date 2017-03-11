@@ -12,7 +12,7 @@ To deploy a load balancer container, use the following command:
 
     docker run -p 80:80 -p 443:443 -e ETCD_PEERS=http://172.17.0.2:2379,http://172.17.0.3:2379 miguelgrinberg/easy-lb
 
-In this example, the `ETCD_PEERS` variable is a comma-separated list of URLs for the etcd service, which must be deployed separately.
+The `ETCD_PEERS` variable is a comma-separated list of URLs for the etcd service, which must be deployed separately. This variable is required.
 
 ## Building
 
@@ -22,11 +22,19 @@ To build the container image locally, you can use the included `build.sh` script
 
 The load balancer is automatically configured from the contents of etcd's `/services` directory. For example, consider the following `etcdctl` commands:
 
-    etcdctl set /services/foo/server1 172.17.0.4:5000
-    etcdctl set /services/foo/server2 172.17.0.5:5000
-    etcdctl set /services/bar/server3 172.17.0.6:5000
+    etcdctl set /services/foo/upstream/server1 172.17.0.4:5000
+    etcdctl set /services/foo/upstream/server2 172.17.0.5:5000
+    etcdctl set /services/bar/upstream/server3 172.17.0.6:5000
 
 This will cause the load balancer to proxy requests to `/foo/...` URLs to server1 and server2, at the addresses and ports specified, while any requests to `/bar/...` URLs will be sent to server3. Note that the names `server{1,2,3}` are not significant, each service can register itself with any name, as long as it is unique.
+
+To mount a service on a different URL, set a `location` key. For example, the following command will make service `foo` available on the root URL:
+
+    etcdctl set /services/foo/location /
+
+To use a custom path in the proxied URLs, set a `path` key. For example, the following command will make nginx send requests to the `foo` service to `/api/foo/...` URLs:
+
+    etcdctl set /services/foo/path /api/foo/
 
 Whenever changes are made in etcd to the `/services` subtree, those changes will automatically trigger a configuration update.
 
@@ -35,3 +43,5 @@ Whenever changes are made in etcd to the `/services` subtree, those changes will
 - SSL support
 - Automatic Let's Encrypt certificates
 - Select load balancing method for each service
+- WebSocket proxying
+- Configure other options in location or upstream blocks

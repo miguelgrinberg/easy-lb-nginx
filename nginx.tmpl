@@ -1,6 +1,6 @@
 {{ range $service := ls "/services" }}
 upstream {{ $service }}_pool {
-    {{ range getvs (printf "/services/%s/*" $service) }}
+    {{ range getvs (printf "/services/%s/upstream/*" $service) }}
     server {{ . }};
     {{ end }}
 }
@@ -13,8 +13,8 @@ server {
     error_log /dev/stderr;
 
     {{ range $service := ls "/services" }}
-    location /{{ $service }}/ {
-        proxy_pass http://{{ $service }}_pool;
+    location {{ if exists (printf "/services/%s/location" $service) }}{{ getv (printf "/services/%s/location" $service) }}{{ else }}/{{ $service }}/{{ end }} {
+        proxy_pass http://{{ $service }}_pool{{ if exists (printf "/services/%s/path" $service) }}{{ getv (printf "/services/%s/path" $service) }}{{ end }};
         proxy_redirect off;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
