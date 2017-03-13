@@ -1,6 +1,6 @@
-# easy-lb
+# easy-lb-nginx
 
-This repository defines a load balancer container for Docker, based on nginx, confd and etcd.
+Simple load balancer container for Docker, based on nginx, confd and etcd.
 
 ## High-level design
 
@@ -10,7 +10,7 @@ The container runs an [nginx](https://www.nginx.com/resources/wiki/) load balanc
 
 To deploy a load balancer container, use the following command:
 
-    docker run -p 80:80 -e ETCD_PEERS=http://172.17.0.2:2379,http://172.17.0.3:2379 miguelgrinberg/easy-lb
+    docker run -p 80:80 -e ETCD_PEERS=http://172.17.0.2:2379,http://172.17.0.3:2379 miguelgrinberg/easy-lb-nginx
 
 The `ETCD_PEERS` variable is a comma-separated list of URLs for the etcd service, which must be deployed separately. This variable is required.
 

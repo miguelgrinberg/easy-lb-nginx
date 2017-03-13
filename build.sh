@@ -1,2 +1,2 @@
 #!/bin/bash
-docker build -t miguelgrinberg/easy-lb .
+docker build -t miguelgrinberg/easy-lb-nginx .
